@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const parse = require('csv-parse/lib/sync');
 
-const datasetPath = "dataset.csv";
+const datasetPath = path.join(__dirname, "./dataset.csv");
 
 function getRandomInteger(minimum, maximum) {
     return minimum + Math.floor(Math.random() * (maximum - minimum + 1));
@@ -26,7 +26,8 @@ class FingerprintGenerator {
             let fingerprint = {};
             for(const datasetAttribute of Object.keys(record)) {
                 const attribute = datasetAttribute.replace("www.", "browserFingerprint/");
-                fingerprint[attribute] = record[datasetAttribute];
+                if(record[datasetAttribute] !== "")
+                    fingerprint[attribute] = record[datasetAttribute];
             }
             if(!(userAgent in this.fingerprints)) {
                 this.fingerprints[userAgent] = [];
@@ -42,7 +43,7 @@ class FingerprintGenerator {
      */
     getFingerprint(requestHeaders) {
         let userAgent = requestHeaders["user-agent"];
-        if(userAgent == missingValueDatasetToken) {
+        if(!userAgent) {
             userAgent = requestHeaders["User-Agent"];
         }
 
@@ -52,7 +53,7 @@ class FingerprintGenerator {
 
         const fingerprintCandidates = this.fingerprints[userAgent];
 
-        return fingerprintCandidates[getRandomInteger(0, fingerprintCandidates.length)];
+        return fingerprintCandidates[getRandomInteger(0, fingerprintCandidates.length - 1)];
     }
 }
 
