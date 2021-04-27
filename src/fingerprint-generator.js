@@ -3,9 +3,65 @@ const path = require('path');
 const parse = require('csv-parse/lib/sync');
 
 const datasetPath = path.join(__dirname, "./dataset.csv");
+const arrayIndexRegexp = /^\d+\/{0,1}/;
 
 function getRandomInteger(minimum, maximum) {
     return minimum + Math.floor(Math.random() * (maximum - minimum + 1));
+}
+
+/*
+ * This function is needed because saving the dataset in the CSV format leads to objects with attribute names like audioCodecs/mp3 or languages/0.
+ * These have to be decoded back to the JSON structure before they can be used.
+ */
+function recursivelyRestoreJSONStructure(squashedObject) {
+    const recurseOn = new Set();
+    let restoredJSON = {};
+    let objectIsArray = Array.isArray(squashedObject);
+    if(objectIsArray) {
+        restoredJSON = new Array(squashedObject.length);
+    }
+
+    for(const attribute in squashedObject) {
+        let attributeToSplit = attribute;
+        let value = squashedObject[attribute];
+        if(objectIsArray) {
+            attributeToSplit = squashedObject[attribute][0];
+            value = squashedObject[attribute][1];
+        }
+
+        if(!attribute.includes("/")) {
+            restoredJSON[attribute] = value;
+        } else {            
+            let [ prefix, body, emptyString ] = attributeToSplit.split(/\/(.*)/);
+            
+            let attributeIsArray = false;
+            if(body.match(arrayIndexRegexp)) {
+                attributeIsArray = true;
+                body = body.replace(arrayIndexRegexp, "");
+            }
+
+            if(!recurseOn.has(prefix)) {
+                if(attributeIsArray) {
+                    restoredJSON[prefix] = [];
+                } else {
+                    restoredJSON[prefix] = {};
+                }
+            }
+
+            if(attributeIsArray) {
+                restoredJSON[prefix].push([body, value]);
+            } else {
+                restoredJSON[prefix][body] = value;
+            }
+            recurseOn.add(prefix);
+        }
+    }
+
+    for(const attribute of recurseOn) {
+        restoredJSON[attribute] = recursivelyRestoreJSONStructure(restoredJSON[attribute]);
+    }
+
+    return restoredJSON;
 }
 
 /**
@@ -25,7 +81,7 @@ class FingerprintGenerator {
             let userAgent = record["browserFingerprint/userAgent"];
             let fingerprint = {};
             for(const datasetAttribute of Object.keys(record)) {
-                const attribute = datasetAttribute.replace("www.", "browserFingerprint/");
+                const attribute = datasetAttribute.replace("www.", "").replace("browserFingerprint/", "");
                 if(record[datasetAttribute] !== "")
                     fingerprint[attribute] = record[datasetAttribute];
             }
@@ -53,7 +109,8 @@ class FingerprintGenerator {
 
         const fingerprintCandidates = this.fingerprints[userAgent];
 
-        return fingerprintCandidates[getRandomInteger(0, fingerprintCandidates.length - 1)];
+        const fingerprint = fingerprintCandidates[getRandomInteger(0, fingerprintCandidates.length - 1)];
+        return recursivelyRestoreJSONStructure(fingerprint);
     }
 }
 
