@@ -7,7 +7,7 @@ describe('Basic test', () => {
     test('should pass', () => {
         for(let x = 0; x < 10000; x++) {
             let fingerprint = fingerprintGenerator.getFingerprint({
-                "locales": ["en", "es", "en-US", "de"]
+                "locales": ["en", "es", "en-US"]
             });
             console.log(util.inspect(fingerprint, {showHidden: false, depth: null}))
         }

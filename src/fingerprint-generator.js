@@ -75,8 +75,6 @@ class FingerprintGenerator {
         const headers = this.headerGenerator.getHeaders(options, requestDependentHeaders);
         const userAgent = "User-Agent" in headers ? headers["User-Agent"] : headers["user-agent"];
 
-        console.log(headers);
-
         let fingerprint = this.fingerprintGeneratorNetwork.generateSample({
             "userAgent": userAgent
         });
