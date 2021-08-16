@@ -1,19 +1,12 @@
-const fs = require('fs');
-const path = require('path');
-const parse = require('csv-parse/lib/sync');
 const { default: ow } = require('ow');
 const HeaderGenerator = require('header-generator');
 
-const { BayesianNetwork } = require("generative-bayesian-network");
+const { BayesianNetwork } = require('generative-bayesian-network');
 
 const fingerprintNetworkDefinition = require('./data_files/fingerprint-network-definition.json');
 
 const STRINGIFIED_PREFIX = '*STRINGIFIED*';
 const MISSING_VALUE_DATASET_TOKEN = '*MISSING_VALUE*';
-
-function getRandomInteger(minimum, maximum) {
-    return minimum + Math.floor(Math.random() * (maximum - minimum + 1));
-}
 
 const browserSpecificationShape = {
     name: ow.string,
@@ -56,7 +49,6 @@ const headerGeneratorOptionsShape = {
  * Fingerprint generator - randomly generates realistic browser fingerprints
  */
 class FingerprintGenerator {
-
     /**
      * @param {HeaderGeneratorOptions} options - default header generation options used unless overridden
      */
@@ -72,45 +64,50 @@ class FingerprintGenerator {
      */
     getFingerprint(options = {}, requestDependentHeaders = {}) {
         ow(options, 'HeaderGeneratorOptions', ow.object.exactShape(headerGeneratorOptionsShape));
-        const headers = this.headerGenerator.getHeaders(options, requestDependentHeaders);
-        const userAgent = "User-Agent" in headers ? headers["User-Agent"] : headers["user-agent"];
 
-        let fingerprint = this.fingerprintGeneratorNetwork.generateSample({
-            "userAgent": userAgent
+        // Generate headers consistent with the inputs to get input-compatible user-agent and accept-language headers needed later
+        const headers = this.headerGenerator.getHeaders(options, requestDependentHeaders);
+        const userAgent = 'User-Agent' in headers ? headers['User-Agent'] : headers['user-agent'];
+
+        // Generate fingerprint consistent with the generated user agent
+        const fingerprint = this.fingerprintGeneratorNetwork.generateSample({
+            userAgent,
         });
 
-        for(const attribute in fingerprint) {
-            if(fingerprint[attribute] == MISSING_VALUE_DATASET_TOKEN) {
+        // Delete any missing attributes and unpack any object/array-like attributes that have been packed together to make the underlying network simpler
+        for (const attribute of Object.keys(fingerprint)) {
+            if (fingerprint[attribute] === MISSING_VALUE_DATASET_TOKEN) {
                 delete fingerprint[attribute];
-            } else if(fingerprint[attribute].startsWith(STRINGIFIED_PREFIX)) {
+            } else if (fingerprint[attribute].startsWith(STRINGIFIED_PREFIX)) {
                 fingerprint[attribute] = JSON.parse(fingerprint[attribute].slice(STRINGIFIED_PREFIX.length));
             }
-        }
+        } 
 
-        if("pluginCharacteristics" in fingerprint) {
-            for(const attribute in fingerprint["pluginCharacteristics"]) {
-                fingerprint[attribute] = fingerprint["pluginCharacteristics"][attribute];
+        // Unpack plugin and screen characteristics attributes that are generated packed together to make sure they are consistent with each other
+        if ('pluginCharacteristics' in fingerprint) {
+            for (const attribute of Object.keys(fingerprint.pluginCharacteristics)) {
+                fingerprint[attribute] = fingerprint.pluginCharacteristics[attribute];
             }
-            delete fingerprint["pluginCharacteristics"];
+            delete fingerprint.pluginCharacteristics;
         }
-
-        if("screenCharacteristics" in fingerprint) {
-            for(const attribute in fingerprint["screenCharacteristics"]) {
-                fingerprint[attribute] = fingerprint["screenCharacteristics"][attribute];
+        if ('screenCharacteristics' in fingerprint) {
+            for (const attribute of Object.keys(fingerprint.screenCharacteristics)) {
+                fingerprint[attribute] = fingerprint.screenCharacteristics[attribute];
             }
-            delete fingerprint["screenCharacteristics"];
+            delete fingerprint.screenCharacteristics;
         }
 
-        let acceptLanguageHeaderValue = "Accept-Language" in headers ? headers["Accept-Language"] : headers["accept-language"];
-        let acceptedLanguages = [];
-        for(const locale of acceptLanguageHeaderValue.split(",")) {
-            acceptedLanguages.push(locale.split(";")[0]);
+        // Manually add the set of accepted languages required by the input
+        const acceptLanguageHeaderValue = 'Accept-Language' in headers ? headers['Accept-Language'] : headers['accept-language'];
+        const acceptedLanguages = [];
+        for (const locale of acceptLanguageHeaderValue.split(',')) {
+            acceptedLanguages.push(locale.split(';')[0]);
         }
-        fingerprint["languages"] = acceptedLanguages;
+        fingerprint.languages = acceptedLanguages;
 
         return {
             fingerprint,
-            headers
+            headers,
         };
     }
 }
