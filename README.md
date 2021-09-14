@@ -113,6 +113,9 @@ Fingerprint generator - randomly generates realistic browser fingerprints
 <a name="FingerprintGenerator+getFingerprint"></a>
 
 #### `fingerprintGenerator.getFingerprint(options, requestDependentHeaders)`
+Generates a fingerprint and a matching set of ordered headers using a combination of the default options specified in the constructor
+and their possible overrides provided here.
+
 
 | Param | Type | Description |
 | --- | --- | --- |

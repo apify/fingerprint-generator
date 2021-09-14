@@ -59,6 +59,8 @@ class FingerprintGenerator {
     }
 
     /**
+     * Generates a fingerprint and a matching set of ordered headers using a combination of the default options specified in the constructor
+     * and their possible overrides provided here.
      * @param {HeaderGeneratorOptions} options - specifies options that should be overridden for this one call
      * @param {Object} requestDependentHeaders - specifies known values of headers dependent on the particular request
      */

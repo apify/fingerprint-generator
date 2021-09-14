@@ -1,4 +1,3 @@
-const util = require('util');
 const FingerprintGenerator = require('../src/main');
 
 describe('Generation tests', () => {
