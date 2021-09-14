@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "NodeJs package for generating realistic browser fingerprints.",
   "main": "src/main.js",
+  "files": [
+    "src"
+  ],
   "scripts": {
     "build-docs": "npm run build-toc && node docs/build-docs.js",
     "build-toc": "markdown-toc docs/README.md -i",
