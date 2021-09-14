@@ -110,8 +110,80 @@ class FingerprintGenerator {
         fingerprint.languages = acceptedLanguages;
 
         return {
-            fingerprint,
+            fingerprint: this._transformFingerprint(fingerprint),
             headers,
+        };
+    }
+
+    /**
+     * @private
+     * @param {Object} fingerprint
+     * @returns {Object} final fingerprint.
+     */
+    _transformFingerprint(fingerprint) {
+        const {
+            availableScreenResolution = [],
+            colorDepth,
+            screenResolution = [],
+            userAgent,
+            cookiesEnabled,
+            languages,
+            platform,
+            mimeTypes,
+            plugins,
+            deviceMemory,
+            hardwareConcurrency,
+            productSub,
+            vendor,
+            touchSupport = {},
+            videoCard,
+            audioCodecs,
+            videoCodecs,
+            battery,
+        } = fingerprint;
+
+        const screen = {
+            availHeight: availableScreenResolution[0],
+            availWidth: availableScreenResolution[1],
+            pixelDepth: colorDepth,
+            height: screenResolution[0],
+            width: screenResolution[1],
+        };
+
+        const parsedMemory = parseInt(deviceMemory, 10);
+        const parsedTouchPoints = parseInt(touchSupport.maxTouchPoints, 10);
+
+        const navigator = {
+            cookieEnabled: cookiesEnabled,
+            doNotTrack: '1',
+            language: languages[0],
+            languages,
+            platform,
+            deviceMemory: Number.isNaN(parsedMemory) ? undefined : parsedMemory, // Firefox does not have deviceMemory available
+            hardwareConcurrency: parseInt(hardwareConcurrency, 10),
+            productSub,
+            vendor,
+            maxTouchPoints: Number.isNaN(parsedTouchPoints) ? 0 : parsedTouchPoints,
+        };
+
+        const pluginsData = {
+            mimeTypes,
+            plugins,
+        };
+        const webGl = {
+            vendor: videoCard[0],
+            renderer: videoCard[1],
+        };
+
+        return {
+            screen,
+            navigator,
+            webGl,
+            audioCodecs,
+            videoCodecs,
+            pluginsData,
+            userAgent,
+            battery,
         };
     }
 }

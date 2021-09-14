@@ -4,7 +4,7 @@ describe('Generation tests', () => {
     const fingerprintGenerator = new FingerprintGenerator();
 
     test('Generates fingerprints without errors', () => {
-        for(let x = 0; x < 10000; x++) {
+        for (let x = 0; x < 10000; x++) {
             const { fingerprint } = fingerprintGenerator.getFingerprint({
                 locales: ['en', 'es', 'en-US'],
             });
@@ -18,7 +18,7 @@ describe('Generation tests', () => {
             locales: ['en', 'de', 'en-GB'],
         });
 
-        const fingerprintLanguages = fingerprint.languages;
+        const fingerprintLanguages = fingerprint.navigator.languages;
         expect(fingerprintLanguages.length).toBe(3);
         expect(fingerprintLanguages.includes('en')).toBeTruthy();
         expect(fingerprintLanguages.includes('de')).toBeTruthy();
@@ -31,6 +31,23 @@ describe('Generation tests', () => {
         });
 
         const headersUserAgent = 'User-Agent' in headers ? headers['User-Agent'] : headers['user-agent'];
-        expect(headersUserAgent === fingerprint['userAgent']).toBeTruthy();
+        expect(headersUserAgent === fingerprint.userAgent).toBeTruthy();
+    });
+
+    test('Transforms schema', () => {
+        const { fingerprint } = fingerprintGenerator.getFingerprint();
+
+        expect(fingerprint.screen.width).toBeDefined();
+        expect(fingerprint.screen.height).toBeDefined();
+        expect(fingerprint.screen.availHeight).toBeDefined();
+        expect(fingerprint.screen.availWidth).toBeDefined();
+        expect(fingerprint.screen.pixelDepth).toBeDefined();
+
+        expect(fingerprint.navigator.language).toBeDefined();
+        expect(fingerprint.navigator.languages).toBeDefined();
+        expect(fingerprint.navigator.hardwareConcurrency).toBeDefined();
+
+        expect(fingerprint.webGl.vendor).toBeDefined();
+        expect(fingerprint.webGl.renderer).toBeDefined();
     });
 });
