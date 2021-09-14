@@ -44,43 +44,55 @@ This method always generates a random realistic fingerprint and a matching set o
 Headers that might be generated for the usage example above:
 ```json
 {
-  'user-agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:90.0) Gecko/20100101 Firefox/90.0',
-  accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-  'accept-language': 'en-US,en;q=0.9',
-  'accept-encoding': 'gzip, deflate, br',
-  'upgrade-insecure-requests': '1',
-  te: 'trailers'
+  "user-agent": "Mozilla/5.0 (X11; Linux x86_64; rv:90.0) Gecko/20100101 Firefox/90.0",
+  "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+  "accept-language": "en-US,en;q=0.9",
+  "accept-encoding": "gzip, deflate, br",
+  "upgrade-insecure-requests": "1",
+  "te": "trailers"
 }
 ```
 And the fingerprint:
 ```json
 {
-  userAgent: 'Mozilla/5.0 (X11; Linux x86_64; rv:90.0) Gecko/20100101 Firefox/90.0',
-  cookiesEnabled: true,
-  timezone: 'Europe/Prague',
-  timezoneOffset: -60,
-  audioCodecs: {
-    ogg: 'probably',
-    mp3: 'maybe',
-    wav: 'probably',
-    m4a: 'maybe',
-    aac: 'maybe'
+  "userAgent": "Mozilla/5.0 (X11; Linux x86_64; rv:90.0) Gecko/20100101 Firefox/90.0",
+  "cookiesEnabled": true,
+  "timezone": "Europe/Prague",
+  "timezoneOffset": -60,
+  "audioCodecs": {
+    "ogg": "probably",
+    "mp3": "maybe",
+    "wav": "probably",
+    "m4a": "maybe",
+    "aac": "maybe"
   },
-  videoCodecs: { ogg: 'probably', h264: 'probably', webm: 'probably' },
-  videoCard: [
-    'Intel Open Source Technology Center',
-    'Mesa DRI Intel(R) HD Graphics 4600 (HSW GT2)'
+  "videoCodecs": {
+    "ogg": "probably", 
+    "h264": "probably", 
+    "webm": "probably"
+  },
+  "videoCard": [
+    "Intel Open Source Technology Center",
+    "Mesa DRI Intel(R) HD Graphics 4600 (HSW GT2)"
   ],
-  productSub: '20100101',
-  hardwareConcurrency: 8,
-  multimediaDevices: { speakers: 0, micros: 0, webcams: 0 },
-  platform: 'Linux x86_64',
-  pluginsSupport: true,
-  screenResolution: [ 1920, 1080 ],
-  availableScreenResolution: [ 1920, 1080 ],
-  colorDepth: 24,
-  touchSupport: { maxTouchPoints: 0, touchEvent: false, touchStart: false },
-  languages: [ 'en-US', 'en' ]
+  "productSub": "20100101",
+  "hardwareConcurrency": 8,
+  "multimediaDevices": { 
+    "speakers": 0, 
+    "micros": 0, 
+    "webcams": 0
+  },
+  "platform": "Linux x86_64",
+  "pluginsSupport": true,
+  "screenResolution": [ 1920, 1080 ],
+  "availableScreenResolution": [ 1920, 1080 ],
+  "colorDepth": 24,
+  "touchSupport": { 
+    "maxTouchPoints": 0, 
+    "touchEvent": false, 
+    "touchStart": false
+  },
+  "languages": [ "en-US", "en" ]
 }
 ```
 ## API Reference
