@@ -41,18 +41,7 @@ let { fingerprint, headers } = fingerprintGenerator.getFingerprint({
 ```
 This method always generates a random realistic fingerprint and a matching set of headers, excluding the request dependant headers, which need to be filled in afterwards. Since the generation is randomized, multiple calls to this method with the same parameters can generate multiple different outputs.
 ## Result example
-Headers that might be generated for the usage example above:
-```json
-{
-  "user-agent": "Mozilla/5.0 (X11; Linux x86_64; rv:90.0) Gecko/20100101 Firefox/90.0",
-  "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-  "accept-language": "en-US,en;q=0.9",
-  "accept-encoding": "gzip, deflate, br",
-  "upgrade-insecure-requests": "1",
-  "te": "trailers"
-}
-```
-And the fingerprint:
+Fingerprint that might be generated for the usage example above:
 ```json
 {
   "userAgent": "Mozilla/5.0 (X11; Linux x86_64; rv:90.0) Gecko/20100101 Firefox/90.0",
@@ -93,6 +82,17 @@ And the fingerprint:
     "touchStart": false
   },
   "languages": [ "en-US", "en" ]
+}
+```
+And the matching headers:
+```json
+{
+  "user-agent": "Mozilla/5.0 (X11; Linux x86_64; rv:90.0) Gecko/20100101 Firefox/90.0",
+  "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+  "accept-language": "en-US,en;q=0.9",
+  "accept-encoding": "gzip, deflate, br",
+  "upgrade-insecure-requests": "1",
+  "te": "trailers"
 }
 ```
 ## API Reference
