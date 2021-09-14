@@ -116,6 +116,8 @@ class FingerprintGenerator {
     }
 
     /**
+     * Transforms fingerprint to the final scheme, more suitable for fingerprint manipulation and injection.
+     * This schema is used in the fingerprint-injector.
      * @private
      * @param {Object} fingerprint
      * @returns {Object} final fingerprint.
