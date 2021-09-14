@@ -74,14 +74,16 @@ class FingerprintGenerator {
             userAgent,
         });
 
-        // Delete any missing attributes and unpack any object/array-like attributes that have been packed together to make the underlying network simpler
+        /* Delete any missing attributes and unpack any object/array-like attributes
+         * that have been packed together to make the underlying network simpler
+         */
         for (const attribute of Object.keys(fingerprint)) {
             if (fingerprint[attribute] === MISSING_VALUE_DATASET_TOKEN) {
                 delete fingerprint[attribute];
             } else if (fingerprint[attribute].startsWith(STRINGIFIED_PREFIX)) {
                 fingerprint[attribute] = JSON.parse(fingerprint[attribute].slice(STRINGIFIED_PREFIX.length));
             }
-        } 
+        }
 
         // Unpack plugin and screen characteristics attributes that are generated packed together to make sure they are consistent with each other
         if ('pluginCharacteristics' in fingerprint) {

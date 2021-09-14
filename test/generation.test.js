@@ -1,16 +1,37 @@
+const util = require('util');
 const FingerprintGenerator = require('../src/main');
-const util = require('util')
 
-describe('Basic test', () => {
+describe('Generation tests', () => {
     const fingerprintGenerator = new FingerprintGenerator();
 
-    test('should pass', () => {
+    test('Generates fingerprints without errors', () => {
         for(let x = 0; x < 10000; x++) {
-            let fingerprint = fingerprintGenerator.getFingerprint({
-                "locales": ["en", "es", "en-US"]
+            const { fingerprint } = fingerprintGenerator.getFingerprint({
+                locales: ['en', 'es', 'en-US'],
             });
-            console.log(util.inspect(fingerprint, {showHidden: false, depth: null}))
+
+            expect(typeof fingerprint).toBe('object');
         }
-        expect(true).toBeTruthy();
+    });
+
+    test('Generates fingerprints with correct languages', () => {
+        const { fingerprint } = fingerprintGenerator.getFingerprint({
+            locales: ['en', 'de', 'en-GB'],
+        });
+
+        const fingerprintLanguages = fingerprint.languages;
+        expect(fingerprintLanguages.length).toBe(3);
+        expect(fingerprintLanguages.includes('en')).toBeTruthy();
+        expect(fingerprintLanguages.includes('de')).toBeTruthy();
+        expect(fingerprintLanguages.includes('en-GB')).toBeTruthy();
+    });
+
+    test('Generated fingerprint and headers match', () => {
+        const { fingerprint, headers } = fingerprintGenerator.getFingerprint({
+            locales: ['en', 'de', 'en-GB'],
+        });
+
+        const headersUserAgent = 'User-Agent' in headers ? headers['User-Agent'] : headers['user-agent'];
+        expect(headersUserAgent === fingerprint['userAgent']).toBeTruthy();
     });
 });
