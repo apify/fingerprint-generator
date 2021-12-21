@@ -1,4 +1,4 @@
-const FingerprintGenerator = require('../src/main');
+import { FingerprintGenerator} from '../src/main';
 
 describe('Generation tests', () => {
     const fingerprintGenerator = new FingerprintGenerator();

@@ -2,16 +2,31 @@
   "name": "fingerprint-generator",
   "version": "1.0.0",
   "description": "NodeJs package for generating realistic browser fingerprints.",
-  "main": "src/main.js",
+  "homepage": "https://github.com/apify/fingerprint-generator#readme",
+  "engines": {
+    "node": ">=15.10.0"
+  },
   "files": [
-    "src"
+    "dist"
   ],
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
   "scripts": {
-    "build-docs": "npm run build-toc && node docs/build-docs.js",
-    "build-toc": "markdown-toc docs/README.md -i",
-    "lint": "./node_modules/.bin/eslint ./src --ext .js,.jsx",
-    "lint:fix": "./node_modules/.bin/eslint ./src --ext .js,.jsx --fix",
-    "test": "jest --maxWorkers=3 --forceExit"
+    "build": "rimraf dist && tsc",
+    "postbuild": "gen-esm-wrapper dist/index.js dist/index.mjs",
+    "prepublishOnly": "npm run build",
+    "lint": "eslint src test",
+    "lint:fix": "eslint src test --fix",
+    "test": "npm run build && jest",
+    "build-docs": "npm run build && npm run build-toc && node docs/build-docs.js",
+    "build-toc": "markdown-toc docs/README.md -i"
   },
   "repository": {
     "type": "git",
@@ -26,15 +41,23 @@
     "csv-parse": "^4.15.3",
     "generative-bayesian-network": "0.1.0-beta.1",
     "header-generator": "^1.1.3",
-    "ow": "^0.24.1"
+    "ow": "^0.24.1",
+    "tslib": "^2.3.1"
   },
-  "homepage": "https://github.com/apify/fingerprint-generator#readme",
   "devDependencies": {
-    "@apify/eslint-config": "^0.1.3",
-    "eslint": "^7.19.0",
-    "fs-extra": "^9.1.0",
-    "jest": "^27.3.1",
+    "@apify/eslint-config-ts": "^0.1.4",
+    "@apify/tsconfig": "^0.1.0",
+    "@types/jest": "^27.0.2",
+    "@typescript-eslint/eslint-plugin": "^4.32.0",
+    "@typescript-eslint/parser": "^4.32.0",
+    "eslint": "^7.0.0",
+    "gen-esm-wrapper": "^1.1.3",
+    "jest": "^27.2.5",
+    "jest-circus": "^27.2.4",
     "jsdoc-to-markdown": "^7.0.0",
-    "markdown-toc": "^1.2.0"
+    "markdown-toc": "^1.2.0",
+    "ts-jest": "^27.0.5",
+    "ts-node": "^10.2.1",
+    "typescript": "^4.4.3"
   }
 }

@@ -1,12 +1,11 @@
-const { default: ow } = require('ow');
-const HeaderGenerator = require('header-generator');
+import ow from 'ow';
+import { HeaderGenerator } from 'header-generator';
 
-const { BayesianNetwork } = require('generative-bayesian-network');
+// @ts-expect-error No ts definition
+import { BayesianNetwork } from 'generative-bayesian-network';
 
-const fingerprintNetworkDefinition = require('./data_files/fingerprint-network-definition.json');
-
-const STRINGIFIED_PREFIX = '*STRINGIFIED*';
-const MISSING_VALUE_DATASET_TOKEN = '*MISSING_VALUE*';
+import fingerprintNetworkDefinition from './data_files/fingerprint-network-definition.json';
+import { MISSING_VALUE_DATASET_TOKEN, STRINGIFIED_PREFIX } from './constants';
 
 const browserSpecificationShape = {
     name: ow.string,
@@ -22,6 +21,15 @@ const headerGeneratorOptionsShape = {
     locales: ow.optional.array.ofType(ow.string),
     httpVersion: ow.optional.string,
 };
+export type Fingerprint = {
+    screen: Record<string, number>,
+    navigator: Record<string, string | number | [] | undefined>,
+    webGl: Record<string, string>,
+    userAgent: string,
+    audioCodecs: Record<string, string>[],
+    videoCodecs: Record<string, string>[],
+    battery?: boolean,
+}
 
 /**
  * @typedef BrowserSpecification
@@ -48,7 +56,11 @@ const headerGeneratorOptionsShape = {
 /**
  * Fingerprint generator - randomly generates realistic browser fingerprints
  */
-class FingerprintGenerator {
+export class FingerprintGenerator {
+    headerGenerator: HeaderGenerator;
+
+    fingerprintGeneratorNetwork: BayesianNetwork;
+
     /**
      * @param {HeaderGeneratorOptions} options - default header generation options used unless overridden
      */
@@ -64,7 +76,7 @@ class FingerprintGenerator {
      * @param {HeaderGeneratorOptions} options - specifies options that should be overridden for this one call
      * @param {Object} requestDependentHeaders - specifies known values of headers dependent on the particular request
      */
-    getFingerprint(options = {}, requestDependentHeaders = {}) {
+    getFingerprint(options = {}, requestDependentHeaders = {}): { headers: Record<string, string>, fingerprint: Fingerprint } {
         ow(options, 'HeaderGeneratorOptions', ow.object.exactShape(headerGeneratorOptionsShape));
 
         // Generate headers consistent with the inputs to get input-compatible user-agent and accept-language headers needed later
@@ -72,7 +84,7 @@ class FingerprintGenerator {
         const userAgent = 'User-Agent' in headers ? headers['User-Agent'] : headers['user-agent'];
 
         // Generate fingerprint consistent with the generated user agent
-        const fingerprint = this.fingerprintGeneratorNetwork.generateSample({
+        const fingerprint: Record<string, any> = this.fingerprintGeneratorNetwork.generateSample({
             userAgent,
         });
 
@@ -122,7 +134,7 @@ class FingerprintGenerator {
      * @param {Object} fingerprint
      * @returns {Object} final fingerprint.
      */
-    _transformFingerprint(fingerprint) {
+    _transformFingerprint(fingerprint: Record<string, any>): Fingerprint {
         const {
             availableScreenResolution = [],
             colorDepth,
@@ -186,8 +198,6 @@ class FingerprintGenerator {
             pluginsData,
             userAgent,
             battery,
-        };
+        } as Fingerprint;
     }
 }
-
-module.exports = FingerprintGenerator;
