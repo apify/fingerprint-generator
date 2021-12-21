@@ -1,4 +1,4 @@
-import { FingerprintGenerator} from '../src/main';
+import { FingerprintGenerator} from '../dist/index';
 
 describe('Generation tests', () => {
     const fingerprintGenerator = new FingerprintGenerator();

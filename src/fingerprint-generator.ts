@@ -1,5 +1,5 @@
 import ow from 'ow';
-import { HeaderGenerator } from 'header-generator';
+import { HeaderGenerator, HeaderGeneratorOptions } from 'header-generator';
 
 // @ts-expect-error No ts definition
 import { BayesianNetwork } from 'generative-bayesian-network';
@@ -21,6 +21,7 @@ const headerGeneratorOptionsShape = {
     locales: ow.optional.array.ofType(ow.string),
     httpVersion: ow.optional.string,
 };
+
 export type Fingerprint = {
     screen: Record<string, number>,
     navigator: Record<string, string | number | [] | undefined>,
@@ -30,7 +31,10 @@ export type Fingerprint = {
     videoCodecs: Record<string, string>[],
     battery?: boolean,
 }
-
+type GetFingerprintReturnType = {
+    headers: Record<string, string>,
+    fingerprint: Fingerprint,
+}
 /**
  * @typedef BrowserSpecification
  * @param {string} name - One of `chrome`, `firefox` and `safari`.
@@ -64,7 +68,7 @@ export class FingerprintGenerator {
     /**
      * @param {HeaderGeneratorOptions} options - default header generation options used unless overridden
      */
-    constructor(options = {}) {
+    constructor(options: Partial<HeaderGeneratorOptions> = {}) {
         ow(options, 'HeaderGeneratorOptions', ow.object.exactShape(headerGeneratorOptionsShape));
         this.headerGenerator = new HeaderGenerator(options);
         this.fingerprintGeneratorNetwork = new BayesianNetwork(fingerprintNetworkDefinition);
@@ -76,7 +80,7 @@ export class FingerprintGenerator {
      * @param {HeaderGeneratorOptions} options - specifies options that should be overridden for this one call
      * @param {Object} requestDependentHeaders - specifies known values of headers dependent on the particular request
      */
-    getFingerprint(options = {}, requestDependentHeaders = {}): { headers: Record<string, string>, fingerprint: Fingerprint } {
+    getFingerprint(options: Partial<HeaderGeneratorOptions> = {}, requestDependentHeaders: Record<string, string> = {}): GetFingerprintReturnType {
         ow(options, 'HeaderGeneratorOptions', ow.object.exactShape(headerGeneratorOptionsShape));
 
         // Generate headers consistent with the inputs to get input-compatible user-agent and accept-language headers needed later
