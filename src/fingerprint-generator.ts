@@ -1,4 +1,3 @@
-import ow from 'ow';
 import { HeaderGenerator, HeaderGeneratorOptions } from 'header-generator';
 
 // @ts-expect-error No ts definition
@@ -7,30 +6,42 @@ import { BayesianNetwork } from 'generative-bayesian-network';
 import fingerprintNetworkDefinition from './data_files/fingerprint-network-definition.json';
 import { MISSING_VALUE_DATASET_TOKEN, STRINGIFIED_PREFIX } from './constants';
 
-const browserSpecificationShape = {
-    name: ow.string,
-    minVersion: ow.optional.number,
-    maxVersion: ow.optional.number,
-    httpVersion: ow.optional.string,
-};
+export type ScreenFingerprint = {
+    availHeight: number,
+    availWidth: number,
+    pixelDepth: number,
+    height: number,
+    width: number,
+}
 
-const headerGeneratorOptionsShape = {
-    browsers: ow.optional.array.ofType(ow.any(ow.object.exactShape(browserSpecificationShape), ow.string)),
-    operatingSystems: ow.optional.array.ofType(ow.string),
-    devices: ow.optional.array.ofType(ow.string),
-    locales: ow.optional.array.ofType(ow.string),
-    httpVersion: ow.optional.string,
-};
+export type NavigatorFingerprint = {
+    cookieEnabled: boolean,
+    doNotTrack: string,
+    language: string,
+    languages: string[],
+    platform: string,
+    deviceMemory?: number, // Firefox does not have deviceMemory available
+    hardwareConcurrency: number,
+    productSub: string,
+    vendor: string,
+    maxTouchPoints?: number;
+}
+
+type WebGl = {
+    vendor: string,
+    renderer: string,
+}
 
 export type Fingerprint = {
-    screen: Record<string, number>,
-    navigator: Record<string, string | number | [] | undefined>,
-    webGl: Record<string, string>,
+    screen: ScreenFingerprint,
+    navigator: NavigatorFingerprint,
+    webGl: WebGl,
     userAgent: string,
-    audioCodecs: Record<string, string>[],
-    videoCodecs: Record<string, string>[],
+    videoCodecs: Record<string, string>,
+    audioCodecs: Record<string, string>,
     battery?: boolean,
 }
+
 type GetFingerprintReturnType = {
     headers: Record<string, string>,
     fingerprint: Fingerprint,
@@ -43,10 +54,14 @@ type GetFingerprintReturnType = {
  * @param {string} httpVersion - Http version to be used to generate headers (the headers differ depending on the version).
  *  Either 1 or 2. If none specified the httpVersion specified in `HeaderGeneratorOptions` is used.
  */
+
 /**
  * @typedef HeaderGeneratorOptions
  * @param {Array<BrowserSpecification|string>} browsers - List of BrowserSpecifications to generate the headers for,
  *  or one of `chrome`, `firefox` and `safari`.
+ * @param {string} browserListQuery - Browser generation query based on the real world data.
+ *  For more info see the [query docs](https://github.com/browserslist/browserslist#full-list).
+ *  If `browserListQuery` is passed the `browsers` array is ignored.
  * @param {Array<string>} operatingSystems - List of operating systems to generate the headers for.
  *  The options are `windows`, `macos`, `linux`, `android` and `ios`.
  * @param {Array<string>} devices - List of devices to generate the headers for. Options are `desktop` and `mobile`.
@@ -60,17 +75,14 @@ type GetFingerprintReturnType = {
 /**
  * Fingerprint generator - randomly generates realistic browser fingerprints
  */
-export class FingerprintGenerator {
-    headerGenerator: HeaderGenerator;
-
+export class FingerprintGenerator extends HeaderGenerator {
     fingerprintGeneratorNetwork: BayesianNetwork;
 
     /**
      * @param {HeaderGeneratorOptions} options - default header generation options used unless overridden
      */
     constructor(options: Partial<HeaderGeneratorOptions> = {}) {
-        ow(options, 'HeaderGeneratorOptions', ow.object.exactShape(headerGeneratorOptionsShape));
-        this.headerGenerator = new HeaderGenerator(options);
+        super(options);
         this.fingerprintGeneratorNetwork = new BayesianNetwork(fingerprintNetworkDefinition);
     }
 
@@ -81,10 +93,8 @@ export class FingerprintGenerator {
      * @param {Object} requestDependentHeaders - specifies known values of headers dependent on the particular request
      */
     getFingerprint(options: Partial<HeaderGeneratorOptions> = {}, requestDependentHeaders: Record<string, string> = {}): GetFingerprintReturnType {
-        ow(options, 'HeaderGeneratorOptions', ow.object.exactShape(headerGeneratorOptionsShape));
-
         // Generate headers consistent with the inputs to get input-compatible user-agent and accept-language headers needed later
-        const headers = this.headerGenerator.getHeaders(options, requestDependentHeaders);
+        const headers = super.getHeaders(options, requestDependentHeaders);
         const userAgent = 'User-Agent' in headers ? headers['User-Agent'] : headers['user-agent'];
 
         // Generate fingerprint consistent with the generated user agent
