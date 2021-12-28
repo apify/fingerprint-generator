@@ -1,4 +1,4 @@
-import { HeaderGenerator, HeaderGeneratorOptions } from 'header-generator';
+import { HeaderGenerator, HeaderGeneratorOptions, Headers } from 'header-generator';
 
 // @ts-expect-error No ts definition
 import { BayesianNetwork } from 'generative-bayesian-network';
@@ -43,7 +43,7 @@ export type Fingerprint = {
 }
 
 export type BrowserFingerprintWithHeaders = {
-    headers: Record<string, string>,
+    headers: Headers,
     fingerprint: Fingerprint,
 }
 /**
