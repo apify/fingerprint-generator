@@ -1,8 +1,24 @@
-const FingerprintGenerator = require('../src/main');
+import { HeaderGeneratorOptions } from 'header-generator';
+import { FingerprintGenerator, PRESETS } from '../src/index';
 
 describe('Generation tests', () => {
     const fingerprintGenerator = new FingerprintGenerator();
+    test('Basic functionality', () => {
+        const { fingerprint } = fingerprintGenerator.getFingerprint({
+            locales: ['en', 'es', 'en-US'],
+            browsers: ['chrome'],
+            devices: ['desktop'],
+        });
+        expect(fingerprint.userAgent.includes('Chrome')).toBe(true);
+    });
 
+    test('Works with presets', () => {
+        const presets = Object.values(PRESETS);
+        for (const preset of presets) {
+            const { fingerprint } = fingerprintGenerator.getFingerprint({ ...preset } as Partial<HeaderGeneratorOptions>);
+            expect(fingerprint).toBeDefined();
+        }
+    });
     test('Generates fingerprints without errors', () => {
         for (let x = 0; x < 10000; x++) {
             const { fingerprint } = fingerprintGenerator.getFingerprint({
