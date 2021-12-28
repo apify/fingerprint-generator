@@ -27,7 +27,7 @@ export type NavigatorFingerprint = {
     maxTouchPoints?: number;
 }
 
-type WebGl = {
+export type WebGl = {
     vendor: string,
     renderer: string,
 }
@@ -42,7 +42,7 @@ export type Fingerprint = {
     battery?: boolean,
 }
 
-type GetFingerprintReturnType = {
+export type BrowserFingerprintWithHeaders = {
     headers: Record<string, string>,
     fingerprint: Fingerprint,
 }
@@ -92,7 +92,10 @@ export class FingerprintGenerator extends HeaderGenerator {
      * @param {HeaderGeneratorOptions} options - specifies options that should be overridden for this one call
      * @param {Object} requestDependentHeaders - specifies known values of headers dependent on the particular request
      */
-    getFingerprint(options: Partial<HeaderGeneratorOptions> = {}, requestDependentHeaders: Record<string, string> = {}): GetFingerprintReturnType {
+    getFingerprint(
+        options: Partial<HeaderGeneratorOptions> = {},
+        requestDependentHeaders: Record<string, string> = {},
+    ): BrowserFingerprintWithHeaders {
         // Generate headers consistent with the inputs to get input-compatible user-agent and accept-language headers needed later
         const headers = super.getHeaders(options, requestDependentHeaders);
         const userAgent = 'User-Agent' in headers ? headers['User-Agent'] : headers['user-agent'];

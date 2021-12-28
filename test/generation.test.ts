@@ -1,5 +1,5 @@
 import { HeaderGeneratorOptions } from 'header-generator';
-import { FingerprintGenerator, PRESETS } from '../dist/index';
+import { FingerprintGenerator, PRESETS } from '../src/index';
 
 describe('Generation tests', () => {
     const fingerprintGenerator = new FingerprintGenerator();
