@@ -9,7 +9,7 @@ describe('Generation tests', () => {
             browsers: ['chrome'],
             devices: ['desktop'],
         });
-        expect(fingerprint.userAgent.includes('Chrome')).toBe(true);
+        expect(fingerprint.navigator.userAgent.includes('Chrome')).toBe(true);
     });
 
     test('Works with presets', () => {
@@ -47,7 +47,7 @@ describe('Generation tests', () => {
         });
 
         const headersUserAgent = 'User-Agent' in headers ? headers['User-Agent'] : headers['user-agent'];
-        expect(headersUserAgent === fingerprint.userAgent).toBeTruthy();
+        expect(headersUserAgent === fingerprint.navigator.userAgent).toBeTruthy();
     });
 
     test('Transforms schema', () => {
@@ -62,8 +62,5 @@ describe('Generation tests', () => {
         expect(fingerprint.navigator.language).toBeDefined();
         expect(fingerprint.navigator.languages).toBeDefined();
         expect(fingerprint.navigator.hardwareConcurrency).toBeDefined();
-
-        expect(fingerprint.webGl.vendor).toBeDefined();
-        expect(fingerprint.webGl.renderer).toBeDefined();
     });
 });

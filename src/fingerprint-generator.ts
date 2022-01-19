@@ -12,34 +12,54 @@ export type ScreenFingerprint = {
     pixelDepth: number,
     height: number,
     width: number,
+    availTop: number,
+    availLeft: number,
+    colorDepth: number,
+    innerHeight: number,
+    outerHeight: number,
+    outerWidth: number,
+    innerWidth: number,
+    screenX: number,
+    pageXOffset: number,
+    pageYOffset: number,
+    devicePixelRatio: number,
+    clientWidth: number,
+    clientHeight: number,
+    hasHDR: boolean;
 }
 
 export type NavigatorFingerprint = {
-    cookieEnabled: boolean,
+    userAgent: string,
+    userAgentData: Record<string, string>,
     doNotTrack: string,
+    appCodeName: string,
+    appName: string,
+    appVersion: string,
+    oscpu: string,
+    webdriver: string,
     language: string,
     languages: string[],
     platform: string,
     deviceMemory?: number, // Firefox does not have deviceMemory available
     hardwareConcurrency: number,
+    product: string,
     productSub: string,
     vendor: string,
-    maxTouchPoints?: number;
-}
-
-export type WebGl = {
-    vendor: string,
-    renderer: string,
+    vendorSub: string,
+    maxTouchPoints?: number,
+    extraProperties: Record<string, string>;
 }
 
 export type Fingerprint = {
     screen: ScreenFingerprint,
     navigator: NavigatorFingerprint,
-    webGl: WebGl,
-    userAgent: string,
     videoCodecs: Record<string, string>,
     audioCodecs: Record<string, string>,
-    battery?: boolean,
+    pluginsData: Record<string, string>,
+    battery?: Record<string, string>,
+    videoCard: string,
+    multimediaDevices: string[],
+    fonts: string[];
 }
 
 export type BrowserFingerprintWithHeaders = {
@@ -110,24 +130,10 @@ export class FingerprintGenerator extends HeaderGenerator {
          */
         for (const attribute of Object.keys(fingerprint)) {
             if (fingerprint[attribute] === MISSING_VALUE_DATASET_TOKEN) {
-                delete fingerprint[attribute];
+                fingerprint[attribute] = null;
             } else if (fingerprint[attribute].startsWith(STRINGIFIED_PREFIX)) {
                 fingerprint[attribute] = JSON.parse(fingerprint[attribute].slice(STRINGIFIED_PREFIX.length));
             }
-        }
-
-        // Unpack plugin and screen characteristics attributes that are generated packed together to make sure they are consistent with each other
-        if ('pluginCharacteristics' in fingerprint) {
-            for (const attribute of Object.keys(fingerprint.pluginCharacteristics)) {
-                fingerprint[attribute] = fingerprint.pluginCharacteristics[attribute];
-            }
-            delete fingerprint.pluginCharacteristics;
-        }
-        if ('screenCharacteristics' in fingerprint) {
-            for (const attribute of Object.keys(fingerprint.screenCharacteristics)) {
-                fingerprint[attribute] = fingerprint.screenCharacteristics[attribute];
-            }
-            delete fingerprint.screenCharacteristics;
         }
 
         // Manually add the set of accepted languages required by the input
@@ -153,68 +159,68 @@ export class FingerprintGenerator extends HeaderGenerator {
      */
     _transformFingerprint(fingerprint: Record<string, any>): Fingerprint {
         const {
-            availableScreenResolution = [],
-            colorDepth,
-            screenResolution = [],
             userAgent,
-            cookiesEnabled,
+            userAgentData,
+            doNotTrack,
+            appCodeName,
+            appName,
+            appVersion,
+            oscpu,
+            webdriver,
             languages,
             platform,
-            mimeTypes,
-            plugins,
             deviceMemory,
             hardwareConcurrency,
+            product,
             productSub,
             vendor,
-            touchSupport = {},
-            videoCard,
+            vendorSub,
+            maxTouchPoints,
+            extraProperties,
+            screen,
+            pluginsData,
             audioCodecs,
             videoCodecs,
             battery,
+            videoCard,
+            multimediaDevices,
+            fonts,
         } = fingerprint;
-
-        const screen = {
-            availHeight: availableScreenResolution[0],
-            availWidth: availableScreenResolution[1],
-            pixelDepth: colorDepth,
-            height: screenResolution[0],
-            width: screenResolution[1],
-        };
-
         const parsedMemory = parseInt(deviceMemory, 10);
-        const parsedTouchPoints = parseInt(touchSupport.maxTouchPoints, 10);
+        const parsedTouchPoints = parseInt(maxTouchPoints, 10);
 
         const navigator = {
-            cookieEnabled: cookiesEnabled,
-            doNotTrack: '1',
+            userAgent,
+            userAgentData,
             language: languages[0],
             languages,
             platform,
-            deviceMemory: Number.isNaN(parsedMemory) ? undefined : parsedMemory, // Firefox does not have deviceMemory available
+            deviceMemory: Number.isNaN(parsedMemory) ? null : parsedMemory, // Firefox does not have deviceMemory available
             hardwareConcurrency: parseInt(hardwareConcurrency, 10),
+            maxTouchPoints: Number.isNaN(parsedTouchPoints) ? 0 : parsedTouchPoints,
+            product,
             productSub,
             vendor,
-            maxTouchPoints: Number.isNaN(parsedTouchPoints) ? 0 : parsedTouchPoints,
-        };
-
-        const pluginsData = {
-            mimeTypes,
-            plugins,
-        };
-        const webGl = {
-            vendor: videoCard[0],
-            renderer: videoCard[1],
+            vendorSub,
+            doNotTrack,
+            appCodeName,
+            appName,
+            appVersion,
+            oscpu,
+            extraProperties,
+            webdriver,
         };
 
         return {
             screen,
             navigator,
-            webGl,
             audioCodecs,
             videoCodecs,
             pluginsData,
-            userAgent,
             battery,
+            videoCard,
+            multimediaDevices,
+            fonts,
         } as Fingerprint;
     }
 }
