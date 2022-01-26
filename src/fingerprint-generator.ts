@@ -50,6 +50,11 @@ export type NavigatorFingerprint = {
     extraProperties: Record<string, string>;
 }
 
+export type VideoCard = {
+    renderer: string;
+    vendor: string;
+}
+
 export type Fingerprint = {
     screen: ScreenFingerprint,
     navigator: NavigatorFingerprint,
@@ -57,7 +62,7 @@ export type Fingerprint = {
     audioCodecs: Record<string, string>,
     pluginsData: Record<string, string>,
     battery?: Record<string, string>,
-    videoCard: string,
+    videoCard: VideoCard,
     multimediaDevices: string[],
     fonts: string[];
 }
