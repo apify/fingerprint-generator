@@ -73,7 +73,7 @@ export type BrowserFingerprintWithHeaders = {
 }
 /**
  * @typedef BrowserSpecification
- * @param {string} name - One of `chrome`, `firefox` and `safari`.
+ * @param {string} name - One of `chrome`, `edge`, `firefox` and `safari`.
  * @param {number} minVersion - Minimal version of browser used.
  * @param {number} maxVersion - Maximal version of browser used.
  * @param {string} httpVersion - Http version to be used to generate headers (the headers differ depending on the version).
@@ -83,7 +83,7 @@ export type BrowserFingerprintWithHeaders = {
 /**
  * @typedef HeaderGeneratorOptions
  * @param {Array<BrowserSpecification|string>} browsers - List of BrowserSpecifications to generate the headers for,
- *  or one of `chrome`, `firefox` and `safari`.
+ *  or one of `chrome`, `edge`, `firefox` and `safari`.
  * @param {string} browserListQuery - Browser generation query based on the real world data.
  *  For more info see the [query docs](https://github.com/browserslist/browserslist#full-list).
  *  If `browserListQuery` is passed the `browsers` array is ignored.
