@@ -1,4 +1,11 @@
 # Fingerprint generator
+
+---
+
+DEPRECATED: The `fingerprint-generator` package now lives in the [fingerprint-suite](https://github.com/apify/fingerprint-suite) repository. This repository is no longer actively maintained.
+
+---
+
 NodeJs package for generating realistic browser fingerprints and matching headers.
 
 Works best with the [Fingerprint injector](https://github.com/apify/fingerprint-injector).
